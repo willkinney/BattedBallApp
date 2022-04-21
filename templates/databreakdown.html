@@ -1,0 +1,178 @@
+<h1> This At Bat vs. All At Bats</h1>
+
+<div id="container" style="width: 100%;">
+    <canvas id="scatter"></canvas>
+  </div>
+
+  <!-- Import Chartjs, the libary used to generate the scatter plot -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+
+  <script>
+    // Make sure the setting for displaying the legend is set to true so it displays
+    Chart.defaults.global.legend.display = true;
+
+    // Get the lists that we passed from views.py
+    var exitvelocity = {{exit_velo|safe}};
+    var launchangle = {{launch_angle|safe}}
+    var playoutcome = {{play_outcome|safe}}
+
+    // Create empty arrays that we will populate for each AB category.
+    // ChartJS can plot maps that hold coordinates, so these will be used to store that.
+    // We need to store everything separately so that the scatter plot will be able to
+    // show or hide different at bat outcome categories.
+    var currentAB = [];
+    var singles = [];
+    var doubles = [];
+    var triples = [];
+    var homeruns = [];
+    var others = [];
+
+
+    for(var i = 0; i < exitvelocity.length; i++){
+
+        // First check the outcome of the play to determine which dataset it belongs to
+        // This is the 'Others' category
+        if (playoutcome[i] == 'Out'
+        || playoutcome[i] == 'Undefined'
+        || playoutcome[i] == 'FieldersChoice'
+        || playoutcome[i] == 'Error'
+        || playoutcome[i] == 'Sacrifice'){
+            // Push the x, y coordinates in a map to the array
+            others.push({
+                x: exitvelocity[i],
+                y: launchangle[i]
+            });
+        }
+
+        //Outcome: Single
+        if (playoutcome[i] == 'Single'){
+            singles.push({
+                x: exitvelocity[i],
+                y: launchangle[i]
+            });
+        }
+        //Outcome: Double
+        if (playoutcome[i] == 'Double'){
+            doubles.push({
+                x: exitvelocity[i],
+                y: launchangle[i]
+            });
+        }
+        //Outcome: Triple
+        if (playoutcome[i] == 'Triple'){
+            triples.push({
+                x: exitvelocity[i],
+                y: launchangle[i]
+            });
+        }
+        //Outcome: Home Run
+        if (playoutcome[i] == 'HomeRun'){
+            homeruns.push({
+                x: exitvelocity[i],
+                y: launchangle[i]
+            });
+        }
+        
+        // Add the current at bat to its own array
+        if (exitvelocity[i] == {{EXIT_SPEED}}){
+            currentAB.push({
+                x: exitvelocity[i],
+                y: launchangle[i]
+            });
+        }
+        
+    }
+
+    // define the settings for the scatter plot
+    var config = {
+      type: 'scatter',
+      data: {
+        datasets: [{
+            // Set others to see through red
+            label: ['Other'],
+            borderColor: 'rgba(255,0,0,.1)',
+            backgroundColor: 'rgba(255,0,0,.1)',
+            data: others,
+            pointRadius: 2
+          }, {
+            // set singles to pink
+            label: ['Singles'],
+            borderColor: 'rgba(255,0,255,.4)',
+            backgroundColor: 'rgba(255,0,255,.4)',
+            data: singles,
+            pointRadius: 2
+          }, {
+            // set doubles to blue
+            label: ['Doubles'],
+            borderColor: 'rgba(0,0,255,.5)',
+            backgroundColor: 'rgba(0,0,255,.5)',
+            data: doubles,
+            pointRadius: 2
+          }, {
+            // set triples to teal
+            label: ['Triples'],
+            borderColor: 'rgba(0,255,255,.6)',
+            backgroundColor: 'rgba(0,255,255,.6)',
+            data: triples,
+            pointRadius: 2
+          }, {
+            // set homeruns to green
+            label: ['Home Runs'],
+            borderColor: 'rgba(0,255,0,.7)',
+            backgroundColor: 'rgba(0,255,0,.7)',
+            data: homeruns,
+            pointRadius: 2
+          }, {
+            // set the current at bat to black
+            label: ['This At Bat'],
+            borderColor: 'rgba(0,0,0,1)',
+            backgroundColor: 'rgba(0,0,0,1)',
+            data: currentAB,
+            // make the current at bat bigger on the plot so it's easier to find
+            pointRadius: 6
+          }
+          
+          
+          ]
+        },
+      options: {
+        // set to true to automatically adjust plot to the size of the window
+        responsive: true,
+
+        // turn off animation
+        // makes everything really slow with this much data
+        animation: false,
+        scales: {
+            // display x-axis label
+            xAxes: [{
+              display: true,
+              scaleLabel: {
+                display: true,
+                labelString: 'Exit Velocity (MPH)'
+              }
+            }],
+            // display y-axis label
+            yAxes: [{
+              display: true,
+              scaleLabel: {
+                display: true,
+                labelString: 'Launch Angle (Degrees)'
+              }
+            }]
+          },
+          // display the legend
+          plugins: {
+            legend: {
+                display: true
+            }
+        } 
+    }
+    };
+
+    // When the window loads get the HTML element and render the plot 
+    window.onload = function() {
+      var ctx = document.getElementById('scatter').getContext('2d');
+      window.myBar = new Chart(ctx, config);
+    };
+
+  </script>

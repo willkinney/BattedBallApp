@@ -1,0 +1,4 @@
+<!-- HTML for the button that will be displayed in the table -->
+<!-- When clicking on the button, pass the batter id and the exit speed from that at row's bat
+     in the link so that the at bat can be found in the scatter plot -->
+<a class="btn btn-info btn-sm" href="{% url 'data breakdown' record.BATTER_ID record.EXIT_SPEED%}">Open</a>
