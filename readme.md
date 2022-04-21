@@ -3,10 +3,10 @@ Prerequisites:
 This application was built using Python 3.8.3 and Django 4.0.1.  I also used a few other extensions to django.
 Below is a list of everything that needs to be installed:
 
-django
-django-tables2
-django-filter
-django-bootstrap3
+1. django
+2. django-tables2
+3. django-filter
+4. django-bootstrap3
 
 
 Usage:
